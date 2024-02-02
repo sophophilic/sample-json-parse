@@ -45,21 +45,40 @@
 <h3>This is a code generated html</h3>
 <div class="container">
 	<div *ngFor="let obj of objToRender; index as i;">
-		<div *ngIf="obj.type === 'simpleKeyValPair' || obj.type === 'simpleObject'">
-			<span><strong>{{obj.key}}</strong></span>:
+		<div *ngIf="obj.type === 'simpleKeyValPair'">
+			<span style="text-transform: uppercase;">
+				<strong>
+					{{obj.key | replaceUnderscore}}
+				</strong>
+			</span>:
 			<span>{{obj.value}}</span>
 		</div>
+		<div *ngIf="obj.type === 'simpleObject'">
+			<span style="text-transform: uppercase;"><strong>{{obj.key | replaceUnderscore}}</strong></span>:
+			<div style="margin-left: 15px;" *ngFor="let key of obj.subKeys">
+				<span style="text-transform: uppercase;">
+					<strong>
+						{{key | replaceUnderscore}}
+					</strong>
+				</span>:
+				<span>{{obj.value[key]}}</span>
+			</div>
+		</div>
 		<div *ngIf="obj.type === 'boolVal'">
-			<span><strong>{{obj.key}}</strong></span>:
+			<span style="text-transform: uppercase;">
+				<strong>
+					{{obj.key | replaceUnderscore}}
+				</strong>
+			</span>:
 			<span>{{obj.value === 'Y' ? '&#9989;' : '&#10060;'}}</span>
 		</div>
 		<div *ngIf="obj.type === 'table'">
-			<span><strong>{{obj.key}}</strong></span><br>
-			<table class="table table-bordered table-hover table-condensed" border="1px">
+			<span style="text-transform: uppercase;"><strong>{{obj.key | replaceUnderscore}}</strong></span><br>
+			<table style="margin-left: 15px;" class="table table-bordered table-hover table-condensed" border="1px">
 				<tbody>
 				<tr>
-					<th *ngFor="let header of obj.headers">
-						{{header}}
+					<th style="text-transform: uppercase;" *ngFor="let header of obj.headers">
+						{{header | replaceUnderscore}}
 					</th>
 				</tr>
 				<tr *ngFor="let val of obj.value">
