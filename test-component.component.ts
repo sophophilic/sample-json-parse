@@ -1,11 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from "@angular/common";
 
+import { Pipe, PipeTransform } from '@angular/core';
+@Pipe({standalone: true, name: 'replaceUnderscore'})
+export class ReplaceUnderscore implements PipeTransform {
+	transform(value: string): string {
+		return value.replace(/_/g, ' ');
+	}
+}
+
 @Component({
   selector: 'app-test-component',
   standalone: true,
   imports: [
-	  CommonModule
+	  CommonModule,
+	  ReplaceUnderscore
   ],
   templateUrl: './test-component.component.html',
   styleUrl: './test-component.component.scss'
@@ -13,16 +22,18 @@ import { CommonModule } from "@angular/common";
 export class TestComponent implements OnInit {
 	message = {
 		"_type": "EA", // --> Ignore
-		"ALC SO ID:": {
+		"ALC SO_ID:": {
 			"#": "90472335,90472335,90571214,90571214,93931420,95240998,95291524,95321172",
-			"Contract End Date": "2024-10-22"
+			"Contract End Date": "2024-10-22",
+			"sav_id": 123,
+			"sav_name": "Tesla"
 		}, // --> Simple Object --> comma separated with key:value structure
 		"EA Sub ID/WO ID:": {"#": "90167936", "Contract End Date": "2024-09-21"}, // --> Simple Object --> comma separated with key:value structure
 		"summary": [
-			{"PMG": "CISE", "ALC": 0.05, "EA": "N"},
-			{"PMG": "DUO SECURITY", "ALC": 0.31, "EA": "N"},
-			{"PMG": "FIREWALL", "ALC": 0.57, "EA": "Y"},
-			{"PMG": "VIRTUAL PRIVATE NETWORK", "ALC": 0.07, "EA": "Y"}
+			{"PMG_Test": "CISE", "ALC": 0.05, "EA": "N"},
+			{"PMG_Test": "DUO SECURITY", "ALC": 0.31, "EA": "N"},
+			{"PMG_Test": "FIREWALL", "ALC": 0.57, "EA": "Y"},
+			{"PMG_Test": "VIRTUAL PRIVATE NETWORK", "ALC": 0.07, "EA": "Y"}
 		], // --> Array of objects --> should be created in a table format with unique keys as header and values as rows
 		"Covered": 0.64, //--> print as string
 		"Covered1": [0.64, 0.8, 0.95], //--> Simple array - comma separated with key:value structure,
@@ -43,15 +54,11 @@ export class TestComponent implements OnInit {
 	}
 
 	parseSimpleObject(val: any, key: any) {
-		let str = '';
-		for(let id in val) {
-			str += `${id}:${val[id]}, `
-		}
-		str = str.substring(0, str.length-2); // -2 to remove last space and comma
 		return {
 			type: 'simpleObject',
 			key: key.substring(0, key.length - 1),
-			value: str
+			value: val,
+			subKeys: Object.keys(val)
 		};
 	}
 
