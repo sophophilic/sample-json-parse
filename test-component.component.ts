@@ -1,11 +1,34 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from "@angular/common";
 
+import { DomSanitizer } from '@angular/platform-browser'
+
+@Pipe({standalone: true, name: 'safeHtml'})
+export class SafeHtmlPipe implements PipeTransform  {
+	constructor(private sanitized: DomSanitizer) {}
+	transform(value: string) {
+		return this.sanitized.bypassSecurityTrustHtml(value);
+	}
+}
+
 import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({standalone: true, name: 'replaceUnderscore'})
-export class ReplaceUnderscore implements PipeTransform {
+export class ReplaceUnderscorePipe implements PipeTransform {
 	transform(value: string): string {
 		return value.replace(/_/g, ' ');
+	}
+}
+
+@Pipe({standalone: true, name: 'convertBoolToSymbol'})
+export class ConvertBoolToSymbolPipe implements PipeTransform {
+	transform(value: any): string {
+		if(typeof value === "boolean") {
+			return value ? '&#9989;' : '&#10060;';
+		}
+		if(typeof value === "string" && (value.toLowerCase() === 'y' || value.toLowerCase() === 'n')) {
+			return value.toUpperCase() === 'Y' ? '&#9989;' : '&#10060;';
+		}
+		return value;
 	}
 }
 
@@ -14,7 +37,9 @@ export class ReplaceUnderscore implements PipeTransform {
   standalone: true,
   imports: [
 	  CommonModule,
-	  ReplaceUnderscore
+	  ReplaceUnderscorePipe,
+	  ConvertBoolToSymbolPipe,
+	  SafeHtmlPipe
   ],
   templateUrl: './test-component.component.html',
   styleUrl: './test-component.component.scss'
@@ -32,7 +57,7 @@ export class TestComponent implements OnInit {
 		"summary": [
 			{"PMG_Test": "CISE", "ALC": 0.05, "EA": "N"},
 			{"PMG_Test": "DUO SECURITY", "ALC": 0.31, "EA": "N"},
-			{"PMG_Test": "FIREWALL", "ALC": 0.57, "EA": "Y"},
+			{"PMG_Test": "FIREWALL", "ALC": 0.57, "EA": true},
 			{"PMG_Test": "VIRTUAL PRIVATE NETWORK", "ALC": 0.07, "EA": "Y"}
 		], // --> Array of objects --> should be created in a table format with unique keys as header and values as rows
 		"Covered": 0.64, //--> print as string
@@ -65,9 +90,9 @@ export class TestComponent implements OnInit {
 	parseBoolean(val: any, key: any) {
 		let valToShow;
 		if(typeof val === "boolean") {
-			valToShow = val ? 'Y' : 'X'
+			valToShow = val ? 'Y' : 'N'
 		} else {
-			valToShow = val.toLowerCase() === 'y' ? 'Y' : 'X';
+			valToShow = val.toLowerCase() === 'y' ? 'Y' : 'N';
 		}
 		return {
 			type: 'boolVal',
