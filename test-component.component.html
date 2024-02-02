@@ -70,7 +70,7 @@
 					{{obj.key | replaceUnderscore}}
 				</strong>
 			</span>:
-			<span>{{obj.value === 'Y' ? '&#9989;' : '&#10060;'}}</span>
+			<span [innerHTML]="obj.value | convertBoolToSymbol | safeHtml"></span>
 		</div>
 		<div *ngIf="obj.type === 'table'">
 			<span style="text-transform: uppercase;"><strong>{{obj.key | replaceUnderscore}}</strong></span><br>
@@ -82,8 +82,7 @@
 					</th>
 				</tr>
 				<tr *ngFor="let val of obj.value">
-					<td *ngFor="let header of obj.headers">
-						{{val[header]}}
+					<td *ngFor="let header of obj.headers" [innerHTML]="val[header] | convertBoolToSymbol | safeHtml">
 					</td>
 				</tr>
 				</tbody>
